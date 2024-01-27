@@ -1,7 +1,9 @@
-// const User = require('../models/user')
+const bcrypt = require("bcrypt");
 const { User } = require("../models");
 
- 
+const secret_key = process.env.SECRET_KEY
+const saltRounds = 10
+
 // register new user 
 const register = async (req, res) => {
     try {
@@ -11,18 +13,21 @@ const register = async (req, res) => {
             password, 
             gender, 
             image, 
-            cityId } = req.body;
+            cityId 
+        } = req.body;
+
+        const hasedPassword = bcrypt.hashSync(password, saltRounds)
         
         const newUserData = {
             username: username, 
             email: email, 
-            password: password, 
+            password: hasedPassword, 
             gender: gender, 
             image: image ? image: '', 
             cityId: cityId 
         }
-
-       const newUser  = await User.create(newUserData);
+    
+       await User.create(newUserData);
        res.status(201).send('success add data')
 
     } catch (err) {
