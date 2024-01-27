@@ -6,6 +6,7 @@ express.Router()
 const auth = express.Router()
 
 auth.post('/auth/register', authController.register)
+auth.post('/auth/login', authController.login)
 
 module.exports = {
     auth

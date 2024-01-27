@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { User } = require("../models");
 
@@ -26,9 +27,11 @@ const register = async (req, res) => {
             image: image ? image: '', 
             cityId: cityId ? cityId: null 
         }
-    
-       await User.create(newUserData);
-       res.status(201).send('success add data')
+        
+        // masih bingung cara agar username jadi unique
+
+        await User.create(newUserData);
+        res.status(201).send('success add data')
 
     } catch (err) {
         console.log(err.message);
@@ -36,6 +39,36 @@ const register = async (req, res) => {
     }
 }
 
+//user login
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const userInDB = await User.findOne({ where: { email: email } }); //find((user) => user.email == email);
+
+        if (!userInDB) {
+            return res.status(401).send('username not found');
+        }
+
+        //compare hash password from database with password input
+        const isPasswordMatch = await bcrypt.compare(password, userInDB.password);
+        if (isPasswordMatch) {
+            //create a JWT token with user information
+            const token = jwt.sign(email, secret_key);
+
+            //send token to the user
+            res.json({ token });
+        } else {
+            return res.status(401).send('Wrong password');
+        }
+        
+    } catch (error) {
+        console.log(error.messagfe);
+        res.status(500).send({ message: 'Internal server error' });
+    }
+}
+
 module.exports = {
-    register
+    register,
+    login
 }
