@@ -19,12 +19,12 @@ const register = async (req, res) => {
         const hasedPassword = bcrypt.hashSync(password, saltRounds)
         
         const newUserData = {
-            username: username, 
-            email: email, 
-            password: hasedPassword, 
-            gender: gender, 
+            username: username ? username: null, 
+            email: email ? email: null, 
+            password: hasedPassword ? hasedPassword : null , //json "password": "" masih masuk ke db
+            gender: gender ? gender: null, 
             image: image ? image: '', 
-            cityId: cityId 
+            cityId: cityId ? cityId: null 
         }
     
        await User.create(newUserData);
