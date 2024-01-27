@@ -29,6 +29,14 @@ const register = async (req, res) => {
         }
         
         // masih bingung cara agar username jadi unique
+        // const userInDB = User.findOne({ where: { username: username } }); 
+
+        // if (!userInDB) {
+        //     await User.create(newUserData);
+        //     res.status(201).send('success add data')
+        // } else {
+        //     return res.send('username already exist')
+        // }
 
         await User.create(newUserData);
         res.status(201).send('success add data')
@@ -44,7 +52,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const userInDB = await User.findOne({ where: { email: email } }); //find((user) => user.email == email);
+        const userInDB = await User.findOne({ where: { email: email } });
 
         if (!userInDB) {
             return res.status(401).send('username not found');
