@@ -1,4 +1,4 @@
-const { Roadmap, Course, RoadmapCourse } = require('../models');
+const { Roadmap, Course, RoadmapCourse, Job } = require('../models');
 const urlMetadata = require('url-metadata');
 
 const addClass = async (req, res) => {
@@ -52,7 +52,28 @@ const getClassDetail = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const data = await Course.findOne({ where: { id } });
+    const courseData = await Course.findByPk(id);
+
+    const roadmapData = await RoadmapCourse.findAll({
+      where: { courseId: courseData.id },
+      include: Roadmap
+    });
+
+    const jobData = await Job.findByPk(roadmapData[0].Roadmap.JobId);
+
+    // get roadmap names
+    const roadmap = [];
+    roadmapData.map(v => roadmap.push(v.Roadmap.name));
+
+    const data = {
+      id,
+      job: jobData.name,
+      roadmap,
+      name: courseData.name,
+      paid: courseData.paid,
+      description: courseData.description,
+      link: courseData.link
+    };
 
     res.status(200).json(data);
   } catch (err) {
