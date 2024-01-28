@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { User } = require("../models");
+const { User, City } = require("../models");
+
+const UserCity = User.belongsTo(City, { as: 'city' }); //User assosiate with City
 
 const secret_key = process.env.SECRET_KEY
 const saltRounds = 10
@@ -25,21 +27,21 @@ const register = async (req, res) => {
             password: hasedPassword ? hasedPassword : null , //json "password": "" masih masuk ke db
             gender: gender ? gender: null, 
             image: image ? image: '', 
-            cityId: cityId ? cityId: null 
+            cityId: cityId 
         }
         
-        // masih bingung cara agar username jadi unique
-        // const userInDB = User.findOne({ where: { username: username } }); 
+    
+        const userInDB = await User.findOne({ where: { username: username } }); 
 
-        // if (!userInDB) {
-        //     await User.create(newUserData);
-        //     res.status(201).send('success add data')
-        // } else {
-        //     return res.send('username already exist')
-        // }
-
-        await User.create(newUserData);
-        res.status(201).send('success add data')
+        if (userInDB) {
+            return res.status(409).json({ message: 'Username already exists' })
+        } 
+       
+        await User.create(newUserData, {
+            include: [ UserCity ]
+        });
+        
+        res.status(201).send('Success add data')
 
     } catch (err) {
         console.log(err.message);
@@ -84,9 +86,6 @@ const logout = async (req, res) => {
         // res.redirect('/login');
 
         res.send('logout success');
-        
-        // const token = req.headers['Authorization'];
-        // res.json({ token });
     } catch (error) {
         console.log(error.message);
         res.status(500).send({ message: 'Internal server error' });
