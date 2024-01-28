@@ -41,10 +41,10 @@ const addClass = async (req, res) => {
     });
     await RoadmapCourse.bulkCreate(payloadRoadmap);
 
-    res.status(201).send({ message: 'Create Class Success' });
+    return res.status(201).send({ message: 'Create Class Success' });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Internal Server Error' });
   };
 };
 
@@ -53,13 +53,22 @@ const getClassDetail = async (req, res) => {
     const { id } = req.params;
 
     const courseData = await Course.findByPk(id);
+    if (!courseData) {
+      return res.status(404).json({ message: 'Data Not Found' });
+    };
 
     const roadmapData = await RoadmapCourse.findAll({
       where: { courseId: courseData.id },
       include: Roadmap
     });
+    if (!roadmapData) {
+      return res.status(404).json({ message: 'Data Not Found' });
+    };
 
     const jobData = await Job.findByPk(roadmapData[0].Roadmap.JobId);
+    if (!jobData) {
+      return res.status(404).json({ message: 'Data Not Found' });
+    };
 
     // get roadmap names
     const roadmap = [];
@@ -75,14 +84,73 @@ const getClassDetail = async (req, res) => {
       link: courseData.link
     };
 
-    res.status(200).json(data);
+    return res.status(200).json(data);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
+
+const editClass = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { roadmapId, name, link, paid, description } = req.body;
+
+    const data = await Course.findByPk(id);
+    if (!data) {
+      return res.status(404).json({ message: 'Data Not Found' });
+    };
+
+    await Course.update({ name, link, paid, description }, { where: { id } });
+
+    const roadmap = [];
+    const roadmapData = await RoadmapCourse.findAll({ where: { courseId: id } });
+    roadmapData.map(v => roadmap.push(v.roadmapId)); // get roadmapId values in an array
+
+    // run code if roadmapId is edited
+    if (roadmap.toString() !== roadmapId.toString()) {
+      await RoadmapCourse.destroy({ where: { courseId: id } }); // replace all data to new ones
+
+      const roadmapPayload = roadmapId.map(v => {
+        const obj = {
+          roadmapId: v,
+          courseId: id,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        return obj;
+      })
+      await RoadmapCourse.bulkCreate(roadmapPayload);
+    };
+
+    return res.status(200).json({ message: 'Update Class Success' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
+
+const deleteClass = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await Course.findByPk(id);
+    if (!data) {
+      return res.status(404).json({ message: 'Data Not Found' });
+    };
+
+    await Course.destroy({ where: { id } });
+
+    return res.status(200).json({ message: 'Delete Class Success' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
   };
 };
 
 module.exports = {
   addClass,
-  getClassDetail
+  getClassDetail,
+  editClass,
+  deleteClass
 };
