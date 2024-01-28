@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { User } = require("../models");
+const { User, City } = require("../models");
+
+const UserCity = User.belongsTo(City, { as: 'city' }); //User assosiate with City
 
 const secret_key = process.env.SECRET_KEY
 const saltRounds = 10
@@ -17,33 +19,37 @@ const register = async (req, res) => {
             cityId 
         } = req.body;
 
+        if (!username || !email || !password || !gender) {
+            return res.status(400).send({ message: 'invalid Data' })
+           }
+
         const hasedPassword = bcrypt.hashSync(password, saltRounds)
         
         const newUserData = {
-            username: username ? username: null, 
-            email: email ? email: null, 
-            password: hasedPassword ? hasedPassword : null , //json "password": "" masih masuk ke db
-            gender: gender ? gender: null, 
-            image: image ? image: '', 
-            cityId: cityId ? cityId: null 
+            username: username, 
+            email: email, 
+            password: hasedPassword,
+            gender: gender, 
+            image: image, 
+            cityId: cityId 
         }
         
-        // masih bingung cara agar username jadi unique
-        // const userInDB = User.findOne({ where: { username: username } }); 
+        const userInDB = await User.findOne({ where: { username: username } }); 
 
-        // if (!userInDB) {
-        //     await User.create(newUserData);
-        //     res.status(201).send('success add data')
-        // } else {
-        //     return res.send('username already exist')
-        // }
-
-        await User.create(newUserData);
-        res.status(201).send('success add data')
+        if (userInDB) {
+            return res.status(409).send({ message: 'Username Already Exists' })
+        } 
+       
+        // include assosiation
+        await User.create(newUserData, {
+            include: [ UserCity ]
+        });
+        
+        return res.status(201).send('User Registration Success')
 
     } catch (err) {
         console.log(err.message);
-        res.status(500).send({ message: 'Internal server error' })
+        return res.status(500).send({ message: 'Internal Server Error' })
     }
 }
 
@@ -55,7 +61,7 @@ const login = async (req, res) => {
         const userInDB = await User.findOne({ where: { email: email } });
 
         if (!userInDB) {
-            return res.status(401).send('username not found');
+            return res.status(401).send('Username Not Found');
         }
 
         //compare hash password from database with password input
@@ -67,12 +73,12 @@ const login = async (req, res) => {
             //send token to the user
             res.json({ token });
         } else {
-            return res.status(401).send('Wrong password');
+            return res.status(401).send('Wrong Password');
         }
         
     } catch (error) {
         console.log(error.messagfe);
-        res.status(500).send({ message: 'Internal server error' });
+        return res.status(500).send({ message: 'Internal Server Error' });
     }
 }
 
@@ -83,13 +89,10 @@ const logout = async (req, res) => {
         res.clearCookie('Authorization');
         // res.redirect('/login');
 
-        res.send('logout success');
-        
-        // const token = req.headers['Authorization'];
-        // res.json({ token });
+        return res.status(200).send('User Logout Success');
     } catch (error) {
         console.log(error.message);
-        res.status(500).send({ message: 'Internal server error' });
+        return res.status(500).send({ message: 'Internal Server Error' });
     }
 }
 module.exports = {
