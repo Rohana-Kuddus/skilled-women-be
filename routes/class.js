@@ -1,11 +1,13 @@
-const express = require("express")
+const express = require('express');
+const { addClass, getClassDetail, editClass, deleteClass, getUserClasses } = require('../controllers/class');
+const { verifyToken } = require('../middlewares/auth');
+const classes = express.Router();
 
-const classController = require('../controllers/class')
+// endpoits
+classes.post('/classes', verifyToken, addClass);
+classes.get('/classes/:id', verifyToken, getClassDetail);
+classes.put('/classes/:id', verifyToken, editClass);
+classes.delete('/classes/:id', verifyToken, deleteClass)
+classes.get('/users/classes', verifyToken, getUserClasses)
 
-const classes = express.Router()
-
-classes.get('/users/classes', classController.getUserClasses)
-
-module.exports = {
-    classes
-}
+module.exports = classes;
