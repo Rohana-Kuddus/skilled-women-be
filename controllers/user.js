@@ -50,29 +50,28 @@ module.exports = {
 
   updateUserProfile: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { username, email, gender, image } =  req.body; 
+      const { userId } = req.params;
+      const { username, email, gender, image } = req.body; 
       
-      const user = await User.findOne({ where: { id } });
-      if (!data) {
-        res.status(404).json({ message: 'User Not Found' });
-      };
-      
-      const payload = {
-        username: username ? username : data.username,
-        email: email ? email : data.email,
-        gender: gender ? gender : data.gender,
-        iamge: image ? image : data.image
+      const updatedUserProfile = {
+        username: username,
+        email: email,
+        gender: gender,
+        image: image,
       };
 
-      await user.update(payload, { where: { id } });
+      const updatedProfile = await User.update(updatedUserProfile, {
+        where: {
+          id: userId,
+        }
+      });
     
       res.status(200).json({
-        message: "User profile Updated"
+        message: "Update user profile succes"
       });
     } catch (error) {
       res.status(500).json({
-        message: 'Internal Server Error',
+        message: error.message || 'Internal Server Error',
       });
     }
   }
