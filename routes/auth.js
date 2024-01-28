@@ -2,7 +2,7 @@ const express = require("express")
 
 const authController = require('../controllers/auth')
 
-express.Router()
+// express.Router()
 const auth = express.Router()
 
 auth.post('/auth/register', authController.register)
