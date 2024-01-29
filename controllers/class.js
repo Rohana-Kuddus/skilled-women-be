@@ -148,9 +148,22 @@ const deleteClass = async (req, res) => {
   };
 };
 
+const getUserClasses = async (req, res) => {
+  try {
+      const userId = req.user.id
+      const data = await Course.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { userId: userId } });
+
+      res.status(200).send({'data' : data });
+  } catch (error) {
+      console.log(error.message);
+      res.status(500).send({ message: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   addClass,
   getClassDetail,
   editClass,
-  deleteClass
+  deleteClass,
+  getUserClasses
 };
