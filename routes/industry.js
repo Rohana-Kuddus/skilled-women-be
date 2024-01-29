@@ -1,11 +1,9 @@
-const express = require("express")
+const express = require("express");
+const industryController = require('../controllers/industry');
+const industry = express.Router();
 
-const industryController = require('../controllers/industry')
-
-const industry = express.Router()
-
-industry.get('/industries', industryController.getAllIndustries)
+industry.get('/industries', industryController.getAllIndustries);
 
 module.exports = {
-    industry
-}
+	industry
+};
