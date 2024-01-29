@@ -9,6 +9,6 @@ classes.get('/classes/:id', verifyToken, getClassDetail);
 classes.put('/classes/:id', verifyToken, editClass);
 classes.delete('/classes/:id', verifyToken, deleteClass);
 classes.get('/users/classes', verifyToken, getUserClasses);
-classes.get('/jobs/:jobId/roadmaps/:roadmapId/classes', getClassRoadmap)
+classes.get('/jobs/:jobId/roadmaps/:roadmapId/classes', getClassRoadmap);
 
 module.exports = classes;
