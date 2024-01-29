@@ -1,20 +1,10 @@
-const { Op } = require('sequelize');
 const { Roadmap, Course, RoadmapCourse, Job, User } = require('../models');
 const urlMetadata = require('url-metadata');
 
 const addClass = async (req, res) => {
   try {
-    // const { id } = req.user;
-    const id = '';
+    const { id } = req.user;
     const { roadmapId, name, link, paid, description } = req.body;
-
-    // function get image from link
-    // const metadata = await urlMetadata(
-    //   'https://academy.apiary.id/growth-hacking-summit-2024', {
-    //   mode: 'same-origin',
-    //   includeResponseBody: true
-    // });
-    // console.log(metadata.responseBody.find('img'));
 
     const payload = {
       name,
@@ -23,9 +13,21 @@ const addClass = async (req, res) => {
       paid,
       link,
       rating: 0,
-      userId: id ? id : null,
+      UserId: id ? id : null,
       createdAt: new Date(),
       updatedAt: new Date()
+    };
+
+    // get image from link
+    try {
+      const metadata = await urlMetadata(link, {
+        mode: 'same-origin',
+        ensureSecureImageRequest: true
+      });
+      payload.image = metadata.favicons[0].href;
+    } catch (err) {
+      console.log({ message: 'Unauthorized', err });
+      payload.image = '';
     };
 
     const course = await Course.create(payload);
@@ -102,7 +104,15 @@ const editClass = async (req, res) => {
       return res.status(404).json({ message: 'Data Not Found' });
     };
 
-    await Course.update({ name, link, paid, description }, { where: { id } });
+    const payload = {
+      name,
+      link,
+      paid,
+      description,
+      updateAt: new Date()
+    };
+
+    await Course.update(payload, { where: { id } });
 
     const roadmap = [];
     const roadmapData = await RoadmapCourse.findAll({ where: { courseId: id } });
@@ -151,10 +161,17 @@ const deleteClass = async (req, res) => {
 
 const getUserClasses = async (req, res) => {
   try {
-    const userId = req.user.id
-    const data = await Course.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { userId: userId } });
+    const userId = req.user.id;
 
-    return res.status(200).json({ data : data });
+    const data = await Course.findAll({
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      where: { userId: userId }
+    });
+    if (data.length === 0) {
+      return res.status(404).json({ message: 'Data Not Found' });
+    };
+
+    return res.status(200).json({ data });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -165,13 +182,16 @@ const getClassRoadmap = async (req, res) => {
   try {
     const { roadmapId } = req.params;
 
-    const data = await RoadmapCourse.findAll({ 
-      where: { roadmapId }, 
-      include: { 
+    const data = await RoadmapCourse.findAll({
+      where: { roadmapId },
+      include: {
         model: Course,
         include: User
-      } 
-      });
+      }
+    });
+    if (data.length === 0) {
+      return res.status(404).json({ message: 'Data Not Found' });
+    };
 
     const result = data.map(val => {
       const obj = {
@@ -188,7 +208,6 @@ const getClassRoadmap = async (req, res) => {
     });
 
     return res.status(200).json({ data: result });
-
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: 'Internal Server Error' });

@@ -64,7 +64,9 @@ const getDetailJob = async (req, res) => {
           model: Figure,
           attributes: ['name', 'image', 'role', 'description']
         }
-      ]
+      ],
+      raw: true,
+      nest: true
     });
 
     const benefitData = await JobBenefit.findAll({ include: Benefit, where: { JobId: id } });
@@ -74,18 +76,17 @@ const getDetailJob = async (req, res) => {
     benefitData.map(v => {
       const obj = {
         description: v.Benefit.description,
-        mage: v.Benefit.image
+        image: v.Benefit.image
       };
       benefits.push(obj);
     });
 
-    // belum kegabung satu object
     const result = {
-      data,
+      ...data,
       benefits
     };
 
-    return res.status(200).json(result);
+    return res.status(200).json({ data: result });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
