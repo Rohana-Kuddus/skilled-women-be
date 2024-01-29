@@ -1,78 +1,117 @@
-const  { User } = require("../models");
-const  { City } = require("../models");
-// const bcrypt = require('bcrypt');
+const { restart } = require("nodemon");
+const { User } = require("../models");
+const bcrypt = require('bcrypt');
 
 // const jwt = require('jsonwebtoken');
 // const saltRound = 10;
 // require('dotenv').config();/]
 
-module.exports = {
-  getAllUser: async (req, res) => {
-    try {
-      const users = await User.findAll();
-            
-      res.status(200).json({
-        message: "Success get all users",
-        data: users
-      });
+const getAllUser = async (req, res) => {
+  try {
+    const users = await User.findAll();
 
-    } catch (error) {
-      res.status(500).json({
-        message: error
+    res.status(200).json({
+      message: "Success get all users",
+      data: users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error,
+    });
+  }
+};
+
+const getUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findOne({ where: { id: userId, } });
+    
+    res.status(200).json({
+      message: "Succes get user by Id",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error,
+    });
+  }
+};
+
+const updateUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { username, email, gender, image, CityId } = req.body;
+
+    const updateProfile = {
+      username: username,
+      email: email,
+      gender: gender,
+      image: image,
+      CityId: CityId,
+    };
+
+    const updatedProfile = await User.update(updateProfile, {
+      where: {
+        id: userId,
+      },
+    });
+
+    res.status(200).json({
+      message: "User Profile Updated",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const updateUserPassword = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { newPassword, confrimPassword } = req.body;
+
+    if(newPassword !== confrimPassword) {
+      return res.status(400).json({
+        message: "Password does not match",
       })
     }
-  },
-  
-  getUserCities: async (req, res) => {
-    try {
-      const cities = await City.findAll({
-        where: {
-          city_id: req.params.id,
-        },
-      });
 
-      if(cities){
-        res.status(200).json({
-          message: `Succes get cities by Id cities`,
-          data: cities,
-        })
-      } else {
-        res.status(404).json({
-          messsage: `Failed to get cities by id user`,
-        })
-      }
-    } catch (error) {
-      res.status(500).json({
-        message: 'Internal Server Error',
-      });
+    const user = await User.findByPk(userId);
+    if(!user) {
+      return res.status(404).json({
+        message: "User not found",
+      })
     }
-  },
 
-  updateUserProfile: async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const { username, email, gender, image } = req.body; 
-      
-      const updatedUserProfile = {
-        username: username,
-        email: email,
-        gender: gender,
-        image: image,
-      };
-
-      const updatedProfile = await User.update(updatedUserProfile, {
-        where: {
-          id: userId,
-        }
-      });
-    
-      res.status(200).json({
-        message: "Update user profile succes"
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: error.message || 'Internal Server Error',
-      });
+    const OldPasswordValid = await bcrypt.compare(req.body.oldPassword, user.password)
+    if(!OldPasswordValid) {
+      return res.status(401).json({
+        message: "Old password in valid",
+      })
     }
+
+    const saltRounds = 10;
+    const newHashPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    user.password = newHashPassword;
+    await user.save();
+
+    res.status(201).json({
+      message: "Password has succesfully changed",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
   }
+};
+
+
+module.exports = {
+  getAllUser,
+  getUserById,
+  updateUserProfile,
+  updateUserPassword,
 };

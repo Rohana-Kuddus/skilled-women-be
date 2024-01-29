@@ -3,13 +3,15 @@ const route = express.Router();
 
 const {
   getAllUser,
-  getUserCities,
+  getUserById,
   updateUserProfile,
+  updateUserPassword,
 } = require("../controllers/user");
 // const verifyToken = require("../middlewares/auth")
 
 route.get('/users', getAllUser);
-route.get('/:id/cities', getUserCities);
-route.put('/:id', updateUserProfile);
+route.get('/users/:userId', getUserById);
+route.put('/users/:userId', updateUserProfile);
+route.patch('/users/:userId', updateUserPassword);
 
 module.exports = route;
