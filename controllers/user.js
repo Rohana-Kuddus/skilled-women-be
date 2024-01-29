@@ -1,10 +1,9 @@
-const { restart } = require("nodemon");
 const { User } = require("../models");
 const bcrypt = require('bcrypt');
 
 // const jwt = require('jsonwebtoken');
 // const saltRound = 10;
-// require('dotenv').config();/]
+// require('dotenv').config();
 
 const getAllUser = async (req, res) => {
   try {
@@ -66,6 +65,7 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+
 const updateUserPassword = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -87,7 +87,7 @@ const updateUserPassword = async (req, res) => {
     const isOldPasswordValid = await bcrypt.compare(req.body.oldPassword, user.password);
     if (!isOldPasswordValid) {
       return res.status(401).json({
-        message: "Old password is wrong",
+        message: "Old password is incorrect",
       });
     }
 
@@ -115,3 +115,7 @@ module.exports = {
   updateUserProfile,
   updateUserPassword,
 };
+
+
+
+
