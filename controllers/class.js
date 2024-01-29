@@ -1,4 +1,5 @@
-const { Roadmap, Course, RoadmapCourse, Job } = require('../models');
+const { Op } = require('sequelize');
+const { Roadmap, Course, RoadmapCourse, Job, User } = require('../models');
 const urlMetadata = require('url-metadata');
 
 const addClass = async (req, res) => {
@@ -150,20 +151,55 @@ const deleteClass = async (req, res) => {
 
 const getUserClasses = async (req, res) => {
   try {
-      const userId = req.user.id
-      const data = await Course.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { userId: userId } });
+    const userId = req.user.id
+    const data = await Course.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { userId: userId } });
 
-      res.status(200).send({'data' : data });
+    return res.status(200).json({ data : data });
   } catch (error) {
-      console.log(error.message);
-      res.status(500).send({ message: 'Internal Server Error' });
-  }
-}
+    console.log(error.message);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
+
+const getClassRoadmap = async (req, res) => {
+  try {
+    const { roadmapId } = req.params;
+
+    const data = await RoadmapCourse.findAll({ 
+      where: { roadmapId }, 
+      include: { 
+        model: Course,
+        include: User
+      } 
+      });
+
+    const result = data.map(val => {
+      const obj = {
+        id: val.Course.id,
+        image: val.Course.image,
+        username: val.Course.User.username,
+        name: val.Course.name,
+        paid: val.Course.paid,
+        description: val.Course.description,
+        link: val.Course.link,
+        rating: val.Course.rating,
+      }
+      return obj;
+    });
+
+    return res.status(200).json({ data: result });
+
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
 
 module.exports = {
   addClass,
   getClassDetail,
   editClass,
   deleteClass,
-  getUserClasses
+  getUserClasses,
+  getClassRoadmap
 };
