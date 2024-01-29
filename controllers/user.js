@@ -115,7 +115,3 @@ module.exports = {
   updateUserProfile,
   updateUserPassword,
 };
-
-
-
-
