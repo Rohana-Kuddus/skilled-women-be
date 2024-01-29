@@ -1,19 +1,14 @@
 const express = require('express');
-const route = express.Router();
-// const verifyToken = require("../middlewares/auth")
-
-
 const {
-  getAllUser,
-  getUserById,
+  getUserProfile,
   updateUserProfile,
   updateUserPassword,
 } = require("../controllers/user");
+const { verifyToken } = require('../middlewares/auth');
+const user = express.Router();
 
-route.get('/users', getAllUser);
-route.get('/users/:userId', getUserById);
-route.put('/users/:userId', updateUserProfile);
-route.patch('/users/:userId', updateUserPassword); //ketika di patch di postman, message: "Old password is incorrect"
-// route.patch('/users/:userId', verifyToken, updateUserPassword);
+user.get('/users', verifyToken, getUserProfile);
+user.put('/users', verifyToken, updateUserProfile);
+user.patch('/users', verifyToken, updateUserPassword);
 
-module.exports = route;
+module.exports = user;
