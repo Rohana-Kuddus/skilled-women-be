@@ -101,7 +101,15 @@ const editClass = async (req, res) => {
       return res.status(404).json({ message: 'Data Not Found' });
     };
 
-    await Course.update({ name, link, paid, description }, { where: { id } });
+    const payload = {
+      name,
+      link,
+      paid,
+      description,
+      updateAt: new Date()
+    };
+
+    await Course.update(payload, { where: { id } });
 
     const roadmap = [];
     const roadmapData = await RoadmapCourse.findAll({ where: { courseId: id } });
