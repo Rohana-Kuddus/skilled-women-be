@@ -1,4 +1,4 @@
-const { Job, Industry, Sequelize } = require('../models');
+const { Job, Industry, Sequelize, Figure, JobBenefit, Benefit, Roadmap } = require('../models');
 
 const getAllJob = async (req, res) => {
   try {
@@ -48,6 +48,68 @@ const getAllJob = async (req, res) => {
   };
 };
 
+const getDetailJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await Job.findByPk(id, {
+      attributes: ['id', ['name', 'title'], 'description', 'percentage', 'percentageSource', 'percentageLink',
+        'income', 'incomeLink', 'video', 'roadmapSummary'],
+      include: [
+        {
+          model: Industry,
+          attributes: ['name', 'image']
+        },
+        {
+          model: Figure,
+          attributes: ['name', 'image', 'role', 'description']
+        }
+      ]
+    });
+
+    const benefitData = await JobBenefit.findAll({ include: Benefit, where: { JobId: id } });
+
+    // create list benefits
+    const benefits = [];
+    benefitData.map(v => {
+      const obj = {
+        description: v.Benefit.description,
+        mage: v.Benefit.image
+      };
+      benefits.push(obj);
+    });
+
+    // belum kegabung satu object
+    const result = {
+      data,
+      benefits
+    };
+
+    return res.status(200).json(result);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
+
+const getJobRoadmap = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await Roadmap.findAll({
+      where: { JobId: id },
+      attributes: ['id', 'name', 'step']
+    });
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
+
 module.exports = {
-  getAllJob
+  getAllJob,
+  getDetailJob,
+  getJobRoadmap
 };
