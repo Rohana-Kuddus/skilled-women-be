@@ -7,7 +7,7 @@ const classes = express.Router();
 classes.post('/classes', verifyToken, addClass);
 classes.get('/classes/:id', verifyToken, getClassDetail);
 classes.put('/classes/:id', verifyToken, editClass);
-classes.delete('/classes/:id', verifyToken, deleteClass)
-classes.get('/users/classes', verifyToken, getUserClasses)
+classes.delete('/classes/:id', verifyToken, deleteClass);
+classes.get('/users/classes', verifyToken, getUserClasses);
 
 module.exports = classes;
