@@ -11,7 +11,7 @@ module.exports = {
       `SELECT id from Courses;`
     );
 
-    await queryInterface.bulkInsert('Roadmap_Courses', [{
+    await queryInterface.bulkInsert('RoadmapCourses', [{
       roadmapId: roadmaps[0][0].id,
       courseId: courses[0][0].id,
       createdAt: new Date(),
@@ -20,6 +20,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Roadmap_Courses', null, {});
+    await queryInterface.bulkDelete('RoadmapCourses', null, {});
   }
 };
