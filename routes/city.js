@@ -10,7 +10,7 @@ const {
 
 //endpoints:
 route.get('/cities', getAllCity); 
-route.get('/:id', getCityById); 
+route.get('/cities/:id', getCityById); 
 
 // Jika pakai token
 // route.get('/cities', verifyToken, getAllCity); 
