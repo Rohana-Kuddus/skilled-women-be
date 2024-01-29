@@ -1,5 +1,6 @@
 const express = require('express');
 const route = express.Router();
+// const verifyToken = require("../middlewares/auth")
 
 const {
   getAllUser,
@@ -7,7 +8,6 @@ const {
   updateUserProfile,
   updateUserPassword,
 } = require("../controllers/user");
-// const verifyToken = require("../middlewares/auth")
 
 route.get('/users', getAllUser);
 route.get('/users/:userId', getUserById);

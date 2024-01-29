@@ -69,26 +69,26 @@ const updateUserProfile = async (req, res) => {
 const updateUserPassword = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { newPassword, confrimPassword } = req.body;
+    const { newPassword, confirmPassword } = req.body;
 
-    if(newPassword !== confrimPassword) {
+    if(newPassword !== confirmPassword) {
       return res.status(400).json({
-        message: "Password does not match",
-      })
+        message: "Password confirmation does not match",
+      });
     }
 
     const user = await User.findByPk(userId);
     if(!user) {
       return res.status(404).json({
         message: "User not found",
-      })
+      });
     }
 
-    const OldPasswordValid = await bcrypt.compare(req.body.oldPassword, user.password)
-    if(!OldPasswordValid) {
+    const isOldPasswordValid = await bcrypt.compare(req.body.oldPassword, user.password);
+    if (!isOldPasswordValid) {
       return res.status(401).json({
-        message: "Old password in valid",
-      })
+        message: "Old password is wrong",
+      });
     }
 
     const saltRounds = 10;
