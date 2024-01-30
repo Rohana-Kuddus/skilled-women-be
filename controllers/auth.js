@@ -1,106 +1,94 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const { User, City } = require("../models");
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const { User } = require('../models');
+require('dotenv').config();
 
-const UserCity = User.belongsTo(City, { as: 'city' }); //User assosiate with City
-
-const secret_key = process.env.SECRET_KEY
-const saltRounds = 10
-
-// register new user 
 const register = async (req, res) => {
-    try {
-        const {
-            username,
-            email,
-            password,
-            gender,
-            image,
-            cityId
-        } = req.body;
+  try {
+    const {
+      username,
+      email,
+      password,
+      gender,
+      image,
+      cityId
+    } = req.body;
 
-        if (!username || !email || !password || !gender) {
-            return res.status(400).send({ message: 'invalid Data' })
-        }
+    if (!username || !email || !password || !gender) {
+      return res.status(400).send({ message: 'Invalid Data' })
+    };
 
-        const hasedPassword = bcrypt.hashSync(password, saltRounds)
+    const saltRounds = 10;
+    const hashedPassword = bcrypt.hashSync(password, saltRounds);
 
-        const newUserData = {
-            username: username,
-            email: email,
-            password: hasedPassword,
-            gender: gender,
-            image: image,
-            cityId: cityId
-        }
+    const newUserData = {
+      username,
+      email,
+      password: hashedPassword,
+      gender,
+      image: image ? image : '',
+      CityId: cityId
+    };
 
-        const userInDB = await User.findOne({ where: { username: username } });
+    const userInDB = await User.findOne({ where: { username } });
+    if (userInDB) {
+      return res.status(409).send({ message: 'Username Already Exists' })
+    };
 
-        if (userInDB) {
-            return res.status(409).send({ message: 'Username Already Exists' })
-        }
+    await User.create(newUserData);
 
-        // include assosiation
-        await User.create(newUserData, {
-            include: [UserCity]
-        });
+    return res.status(201).send({ message: 'User Registration Success' })
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: 'Internal Server Error' })
+  };
+};
 
-        return res.status(201).send({ message: 'User Registration Success' })
-
-    } catch (err) {
-        console.log(err.message);
-        return res.status(500).send({ message: 'Internal Server Error' })
-    }
-}
-
-//user login
 const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        const userInDB = await User.findOne({ where: { email: email } });
+    const userInDB = await User.findOne({ where: { email } });
+    if (!userInDB) {
+      return res.status(401).send({ message: 'User Not Found' });
+    };
 
-        if (!userInDB) {
-            return res.status(401).send({ message: 'Username Not Found' });
-        }
+    //compare hash password from database with password input
+    const isPasswordMatch = await bcrypt.compare(password, userInDB.password);
+    if (isPasswordMatch) {
+      const payload = {
+        id: userInDB.id,
+        email
+      };
+      //create a JWT token with user information
+      const token = jwt.sign(payload, process.env.SECRET_KEY);
 
-        //compare hash password from database with password input
-        const isPasswordMatch = await bcrypt.compare(password, userInDB.password);
-        if (isPasswordMatch) {
-            const payload = {
-                id: userInDB.id,
-                email
-            };
-            //create a JWT token with user information
-            const token = jwt.sign(payload, secret_key);
+      //send token to the user
+      res.json({ token });
+    } else {
+      return res.status(401).send({ message: 'Wrong Password' });
+    };
 
-            //send token to the user
-            res.json({ token });
-        } else {
-            return res.status(401).send({ message: 'Wrong Password' });
-        }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: 'Internal Server Error' });
+  };
+};
 
-    } catch (error) {
-        console.log(error.messagfe);
-        return res.status(500).send({ message: 'Internal Server Error' });
-    }
-}
-
-// user logout
 const logout = async (req, res) => {
-    try {
-        //clear JWT token and redirect to /login
-        res.clearCookie('Authorization');
-        // res.redirect('/login');
+  try {
+    // clear JWT token
+    res.clearCookie('Authorization');
 
-        return res.status(200).send({ message: 'User Logout Success' });
-    } catch (error) {
-        console.log(error.message);
-        return res.status(500).send({ message: 'Internal Server Error' });
-    }
-}
+    return res.status(200).send({ message: 'User Logout Success' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: 'Internal Server Error' });
+  };
+};
+
 module.exports = {
-    register,
-    login,
-    logout
+  register,
+  login,
+  logout
 }

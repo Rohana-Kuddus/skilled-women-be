@@ -9,6 +9,4 @@ auth.post('/auth/register', authController.register)
 auth.post('/auth/login', authController.login)
 auth.get('/auth/logout', verifyToken, authController.logout)
 
-module.exports = {
-    auth
-}
+module.exports = auth;

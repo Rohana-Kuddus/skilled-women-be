@@ -24,7 +24,7 @@ const addClass = async (req, res) => {
         mode: 'same-origin',
         ensureSecureImageRequest: true
       });
-      payload.image = metadata.favicons[0].href;
+      payload.image = metadata.favicons.length !== 0 ? metadata.favicons[0].href : '';
     } catch (err) {
       console.log({ message: 'Unauthorized', err });
       payload.image = '';
@@ -87,7 +87,7 @@ const getClassDetail = async (req, res) => {
       link: courseData.link
     };
 
-    return res.status(200).json({ data });
+    return res.status(200).json({ message: 'Get Class Detail Success', data });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -110,6 +110,19 @@ const editClass = async (req, res) => {
       paid,
       description,
       updateAt: new Date()
+    };
+
+    if (link !== data.link) {
+      try {
+        const metadata = await urlMetadata(link, {
+          mode: 'same-origin',
+          ensureSecureImageRequest: true
+        });
+        payload.image = metadata.favicons.length !== 0 ? metadata.favicons[0].href : '';
+      } catch (err) {
+        console.log({ message: 'Unauthorized', err });
+        payload.image = '';
+      };
     };
 
     await Course.update(payload, { where: { id } });
@@ -165,15 +178,15 @@ const getUserClasses = async (req, res) => {
 
     const data = await Course.findAll({
       attributes: { exclude: ['createdAt', 'updatedAt'] },
-      where: { userId: userId }
+      where: { userId }
     });
     if (data.length === 0) {
       return res.status(404).json({ message: 'Data Not Found' });
     };
 
-    return res.status(200).json({ data });
-  } catch (error) {
-    console.log(error.message);
+    return res.status(200).json({ message: 'Get User Class Success', data });
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   };
 };
@@ -207,9 +220,9 @@ const getClassRoadmap = async (req, res) => {
       return obj;
     });
 
-    return res.status(200).json({ data: result });
-  } catch (error) {
-    console.log(error.message);
+    return res.status(200).json({ message: 'Get Class Roadmap Success', data: result });
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   };
 };

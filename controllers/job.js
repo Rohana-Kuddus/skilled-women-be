@@ -41,7 +41,7 @@ const getAllJob = async (req, res) => {
       return obj;
     });
 
-    return res.status(200).json({ data: result });
+    return res.status(200).json({ message: 'Get All Job Success', data: result });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -86,7 +86,7 @@ const getDetailJob = async (req, res) => {
       benefits
     };
 
-    return res.status(200).json({ data: result });
+    return res.status(200).json({ message: 'Get Detail Job Success', data: result });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -102,7 +102,7 @@ const getJobRoadmap = async (req, res) => {
       attributes: ['id', 'name', 'step']
     });
 
-    return res.status(200).json({ data });
+    return res.status(200).json({ message: 'Get Job Roadmap Success', data });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });

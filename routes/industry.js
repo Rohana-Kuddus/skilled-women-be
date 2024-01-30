@@ -4,6 +4,4 @@ const industry = express.Router();
 
 industry.get('/industries', industryController.getAllIndustries);
 
-module.exports = {
-	industry
-};
+module.exports = industry;
