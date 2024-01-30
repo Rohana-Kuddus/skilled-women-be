@@ -18,14 +18,10 @@ const getUserProfile = async (req, res) => {
     user.city = user.City.name;
     delete user.City;
     
-    return res.status(200).json({
-      message: 'Success Get User Profile',
-      data: user,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-    });
+    return res.status(200).json({ message: 'Get User Profile Success', data: user });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
   };
 };
 
@@ -45,14 +41,11 @@ const updateUserProfile = async (req, res) => {
 
     await User.update(updateProfile, { where: { id } });
 
-    res.status(200).json({
-      message: 'User Profile Updated',
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: 'Internal Server Error',
-    });
-  }
+    return res.status(200).json({ message: 'Update User Profile Success' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
 };
 
 
@@ -76,14 +69,10 @@ const updateUserPassword = async (req, res) => {
 
     await user.save();
 
-    res.status(201).json({
-      message: 'Update Password Success',
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: 'Internal server error',
-    });
+    return res.status(201).json({ message: 'Update User Password Success' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
   };
 };
 
@@ -93,7 +82,3 @@ module.exports = {
   updateUserProfile,
   updateUserPassword,
 };
-
-
-
-

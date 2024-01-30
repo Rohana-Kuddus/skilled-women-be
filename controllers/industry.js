@@ -7,11 +7,11 @@ const getAllIndustries = async (req, res) => {
     });
 
     return res.status(200).send({ message: 'Get All Industries Success', data });
-  } catch (error) {
-    console.log(error.message);
+  } catch (err) {
+    console.log(err);
     return res.status(500).send({ message: 'Internal Server Error' });
-  }
-}
+  };
+};
 
 module.exports = {
   getAllIndustries

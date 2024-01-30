@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const { User } = require('../models');
 require('dotenv').config();
 
-// register new user 
 const register = async (req, res) => {
   try {
     const {
@@ -40,21 +39,19 @@ const register = async (req, res) => {
 
     return res.status(201).send({ message: 'User Registration Success' })
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
     return res.status(500).send({ message: 'Internal Server Error' })
   };
 };
 
-//user login
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const userInDB = await User.findOne({ where: { email } });
-
     if (!userInDB) {
       return res.status(401).send({ message: 'User Not Found' });
-    }
+    };
 
     //compare hash password from database with password input
     const isPasswordMatch = await bcrypt.compare(password, userInDB.password);
@@ -70,26 +67,26 @@ const login = async (req, res) => {
       res.json({ token });
     } else {
       return res.status(401).send({ message: 'Wrong Password' });
-    }
+    };
 
-  } catch (error) {
-    console.log(error.messagfe);
+  } catch (err) {
+    console.log(err);
     return res.status(500).send({ message: 'Internal Server Error' });
-  }
-}
+  };
+};
 
-// user logout
 const logout = async (req, res) => {
   try {
     // clear JWT token
     res.clearCookie('Authorization');
 
     return res.status(200).send({ message: 'User Logout Success' });
-  } catch (error) {
-    console.log(error.message);
+  } catch (err) {
+    console.log(err);
     return res.status(500).send({ message: 'Internal Server Error' });
-  }
-}
+  };
+};
+
 module.exports = {
   register,
   login,

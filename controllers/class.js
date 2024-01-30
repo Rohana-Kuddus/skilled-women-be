@@ -185,8 +185,8 @@ const getUserClasses = async (req, res) => {
     };
 
     return res.status(200).json({ message: 'Get User Class Success', data });
-  } catch (error) {
-    console.log(error.message);
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   };
 };
@@ -221,8 +221,8 @@ const getClassRoadmap = async (req, res) => {
     });
 
     return res.status(200).json({ message: 'Get Class Roadmap Success', data: result });
-  } catch (error) {
-    console.log(error.message);
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   };
 };
