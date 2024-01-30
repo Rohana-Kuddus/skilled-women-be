@@ -227,11 +227,37 @@ const getClassRoadmap = async (req, res) => {
   };
 };
 
+const voteClass = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { vote } = req.body;
+
+    const data = await Course.findByPk(id);
+    if (!data) {
+      return res.status(404).json({ message: 'Data Not Found' });
+    };
+
+    // increment and decrement rating process
+    if (!vote && data.rating !== 0) {
+      data.rating -= 1;
+    } else if (vote) {
+      data.rating += 1;
+    };
+    await data.save();
+
+    return res.status(200).json({ message: 'Vote Class Success' })
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
+
 module.exports = {
   addClass,
   getClassDetail,
   editClass,
   deleteClass,
   getUserClasses,
-  getClassRoadmap
+  getClassRoadmap,
+  voteClass
 };
