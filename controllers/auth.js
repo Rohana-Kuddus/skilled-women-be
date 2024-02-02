@@ -75,20 +75,7 @@ const login = async (req, res) => {
   };
 };
 
-const logout = async (req, res) => {
-  try {
-    // clear JWT token
-    res.clearCookie('Authorization');
-
-    return res.status(200).send({ message: 'User Logout Success' });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send({ message: 'Internal Server Error' });
-  };
-};
-
 module.exports = {
   register,
-  login,
-  logout
+  login
 }
