@@ -53,7 +53,7 @@ const getDetailJob = async (req, res) => {
     const { id } = req.params;
 
     const data = await Job.findByPk(id, {
-      attributes: ['id', ['name', 'title'], 'description', 'percentage', 'percentageSource', 'percentageLink',
+      attributes: ['id', ['name', 'title'], 'image', 'description', 'percentage', 'percentageSource', 'percentageLink',
         'income', 'incomeLink', 'video', 'roadmapSummary'],
       include: [
         {
