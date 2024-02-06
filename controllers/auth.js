@@ -53,17 +53,14 @@ const login = async (req, res) => {
       return res.status(401).send({ message: 'User Not Found' });
     };
 
-    //compare hash password from database with password input
-    const isPasswordMatch = await bcrypt.compare(password, userInDB.password);
+    const isPasswordMatch = await bcrypt.compare(password, userInDB.password); // compare password
     if (isPasswordMatch) {
       const payload = {
         id: userInDB.id,
         email
       };
-      //create a JWT token with user information
       const token = jwt.sign(payload, process.env.SECRET_KEY);
 
-      //send token to the user
       res.json({ token });
     } else {
       return res.status(401).send({ message: 'Wrong Password' });
