@@ -206,11 +206,12 @@ const getClassRoadmap = async (req, res) => {
       return res.status(404).json({ message: 'Data Not Found' });
     };
 
+    
     const result = data.map(val => {
       const obj = {
         id: val.Course.id,
         image: val.Course.image,
-        username: val.Course.User.username,
+        username: val.Course.User ? val.Course.User.username : '',
         name: val.Course.name,
         paid: val.Course.paid,
         description: val.Course.description,
