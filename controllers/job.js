@@ -2,20 +2,20 @@ const { Job, Industry, Sequelize, Figure, JobBenefit, Benefit, Roadmap } = requi
 
 const getAllJob = async (req, res) => {
   try {
-    const { industry, search } = req.query;
+    const { industry, search, limit } = req.query;
 
     const payload = {
       include: {
         model: Industry
-      }, 
-      attributes: ['id', 'name', 'image', 'cta' ]
+      },
+      attributes: ['id', 'name', 'image', 'cta']
     };
 
     if (search) {
       payload.where = {
         name: {
-          [Sequelize.Op.like]: `%${search}%` 
-        } 
+          [Sequelize.Op.like]: `%${search}%`
+        }
       };
     };
 
@@ -23,6 +23,10 @@ const getAllJob = async (req, res) => {
       payload.include.where = {
         name: industry
       };
+    };
+
+    if (limit) {
+      payload.limit = parseInt(limit);
     };
 
     const data = await Job.findAll(payload);
