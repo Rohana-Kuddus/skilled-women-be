@@ -61,11 +61,10 @@ const login = async (req, res) => {
       };
       const token = jwt.sign(payload, process.env.SECRET_KEY);
 
-      res.json({ token });
+      return res.json({ token });
     } else {
       return res.status(401).send({ message: 'Wrong Password' });
     };
-
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Internal Server Error' });
@@ -89,7 +88,7 @@ const resetPassword = async (req, res) => {
 
     await data.save();
 
-    return res.status(200).json({ message: 'Reset Success' });
+    return res.status(200).json({ message: 'Reset Password Success' });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: 'Internal Server Error' });
