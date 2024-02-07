@@ -6,7 +6,7 @@ const getUserProfile = async (req, res) => {
     const { id } = req.user;
 
     const user = await User.findByPk(id, {
-      attributes: { exclude: ['id', 'password', 'createdAt', 'updatedAt', 'CityId'] },
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'CityId'] },
       include: City,
       raw: true,
       nest: true
@@ -15,6 +15,7 @@ const getUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User Not Found' });
     };
 
+    user.gender = user.gender === 'F' ? 'Perempuan' : 'Laki-Laki';
     user.city = user.City.name;
     delete user.City;
     
