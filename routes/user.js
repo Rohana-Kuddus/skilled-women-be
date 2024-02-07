@@ -10,7 +10,7 @@ const user = express.Router();
 
 user.get('/users', verifyToken, getUserProfile);
 user.put('/users', verifyToken, updateUserProfile);
-user.patch('/users', verifyToken, updateUserPassword);
+user.patch('/users', updateUserPassword);
 user.post('/users', checkUser);
 
 module.exports = user;
