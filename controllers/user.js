@@ -76,25 +76,8 @@ const updateUserPassword = async (req, res) => {
   };
 };
 
-const checkUser = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    const data = await User.findOne({ where: { email }});
-    if (!data) {
-      return res.status(404).json({ message: 'User Not Found' });
-    }
-
-    return res.json({ message: 'Check User Success' });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  };
-};
-
 module.exports = {
   getUserProfile,
   updateUserProfile,
-  updateUserPassword,
-  checkUser
+  updateUserPassword
 };

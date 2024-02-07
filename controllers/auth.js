@@ -72,7 +72,49 @@ const login = async (req, res) => {
   };
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const data = await User.findOne({ where: { email }});
+    if(!data) {
+      return res.status(404).json({ message: 'User Not Found' });
+    };
+
+    const saltRounds = 10;
+    const newHashPassword = await bcrypt.hash(password, saltRounds);
+
+    data.password = newHashPassword;
+    data.updatedAt = new Date();
+
+    await data.save();
+
+    return res.status(200).json({ message: 'Reset Success' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
+
+const checkUser = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const data = await User.findOne({ where: { email }});
+    if (!data) {
+      return res.status(404).json({ message: 'User Not Found' });
+    }
+
+    return res.json({ message: 'Check User Success' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+};
+
 module.exports = {
   register,
-  login
+  login,
+  resetPassword,
+  checkUser
 }
