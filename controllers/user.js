@@ -35,7 +35,7 @@ const updateUserProfile = async (req, res) => {
       username,
       email,
       gender,
-      image: file.path,
+      image: file ? file.path : '',
       CityId: cityId,
       updatedAt: new Date()
     };
