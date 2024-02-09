@@ -83,7 +83,7 @@ const getUserImage = async (req, res) => {
 
     const { image } = await User.findByPk(id, { attributes: ['image'] });
     if (!image) {
-      return res.status(404).json({ message: 'User Not Found' });
+      return res.status(404).json({ message: 'Image Not Found' });
     };
 
     const root = path.resolve();
