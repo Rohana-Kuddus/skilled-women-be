@@ -27,14 +27,13 @@ const getUserProfile = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   try {
-    const { id } = req.user;
-    const { username, email, gender, image, cityId } = req.body;
+    const { user: { id }, file, body: { username, email, gender, cityId } } = req;
 
     const updateProfile = {
       username,
       email,
       gender,
-      image,
+      image: file.path,
       CityId: cityId,
       updatedAt: new Date()
     };
