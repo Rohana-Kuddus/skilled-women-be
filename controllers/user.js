@@ -7,7 +7,7 @@ const getUserProfile = async (req, res) => {
     const { id } = req.user;
 
     const user = await User.findByPk(id, {
-      attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'CityId'] },
+      attributes: { exclude: ['password', 'image', 'createdAt', 'updatedAt', 'CityId'] },
       include: City,
       raw: true,
       nest: true
