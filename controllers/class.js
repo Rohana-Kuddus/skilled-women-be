@@ -24,7 +24,9 @@ const addClass = async (req, res) => {
         mode: 'same-origin',
         ensureSecureImageRequest: true
       });
-      payload.image = metadata.favicons.length !== 0 ? metadata.favicons[0].href : '';
+
+      const validateUrl = metadata.favicons.length !== 0 && metadata.favicons[0].href.includes('https://');
+      payload.image = validateUrl ? metadata.favicons[0].href : '';
     } catch (err) {
       console.log({ message: 'Unauthorized', err });
       payload.image = '';
@@ -118,7 +120,9 @@ const editClass = async (req, res) => {
           mode: 'same-origin',
           ensureSecureImageRequest: true
         });
-        payload.image = metadata.favicons.length !== 0 ? metadata.favicons[0].href : '';
+  
+        const validateUrl = metadata.favicons.length !== 0 && metadata.favicons[0].href.includes('https://');
+        payload.image = validateUrl ? metadata.favicons[0].href : '';
       } catch (err) {
         console.log({ message: 'Unauthorized', err });
         payload.image = '';
