@@ -1,6 +1,5 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
 const { getUserProfile, updateUserProfile, updateUserPassword, getUserImage } = require("../controllers/user");
 const { verifyToken } = require('../middlewares/auth');
 
