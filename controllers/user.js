@@ -1,5 +1,6 @@
 const { User, City } = require('../models');
 const bcrypt = require('bcrypt');
+const path = require('path');
 
 const getUserProfile = async (req, res) => {
   try {
@@ -76,8 +77,27 @@ const updateUserPassword = async (req, res) => {
   };
 };
 
+const getUserImage = async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    const { image } = await User.findByPk(id, { attributes: ['image'] });
+    if (!image) {
+      return res.status(404).json({ message: 'User Not Found' });
+    };
+
+    const root = path.resolve();
+
+    return res.status(200).sendFile(image, { root });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  };
+}
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
-  updateUserPassword
+  updateUserPassword,
+  getUserImage
 };
