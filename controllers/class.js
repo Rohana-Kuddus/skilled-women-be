@@ -204,7 +204,10 @@ const getClassRoadmap = async (req, res) => {
       include: {
         model: Course,
         include: User
-      }
+      },
+      order: [
+        ['Course', 'rating', 'DESC']
+      ]
     });
     if (data.length === 0) {
       return res.status(404).json({ message: 'Data Not Found' });
